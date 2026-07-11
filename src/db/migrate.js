@@ -52,6 +52,11 @@ async function runMigration(client, filename) {
 async function migrate() {
   const client = await pool.connect();
   try {
+    // Acquire an advisory lock so only one process runs migrations at a time.
+    // This prevents race conditions when multiple replicas start concurrently.
+    const LOCK_KEY = 1234567890; // arbitrary constant; can be any 64-bit signed integer
+    await client.query("SELECT pg_advisory_lock($1)", [LOCK_KEY]);
+
     await ensureMigrationsTable(client);
     const applied = await getAppliedMigrations(client);
     const migrations = await loadMigrations();
@@ -66,6 +71,12 @@ async function migrate() {
       await runMigration(client, filename);
     }
   } finally {
+    try {
+      const LOCK_KEY = 1234567890;
+      await client.query("SELECT pg_advisory_unlock($1)", [LOCK_KEY]);
+    } catch (err) {
+      // ignore unlock errors
+    }
     client.release();
     await pool.end();
   }
