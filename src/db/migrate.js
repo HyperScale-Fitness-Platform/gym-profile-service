@@ -1,13 +1,8 @@
 const fs = require("fs").promises;
 const path = require("path");
-const { Pool } = require("pg");
+const { pool } = require("../config/database");
 
 const migrationsPath = path.join(__dirname, "migrations");
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-  ssl:
-    process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : false,
-});
 
 async function ensureMigrationsTable(client) {
   await client.query(`

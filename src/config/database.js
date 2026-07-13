@@ -1,12 +1,15 @@
-// Database configuration for PostgreSQL
+// Load local .env in development so connection strings are available
+require("dotenv").config();
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
   ssl:
     process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : false,
 });
 
-module.exports = {
-  pool,
-};
+module.exports = { pool };
