@@ -1,0 +1,359 @@
+{
+  "info": {
+    "_postman_id": "profile-service-collection",
+    "name": "Profile Service API",
+    "description": "Gym Profile Service - Customer, Trainer, and Certification Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "550e8400-e29b-41d4-a716-446655440000",
+      "type": "string"
+    },
+    {
+      "key": "customer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trainer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cert_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer Profiles",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              },
+              {
+                "key": "user-email",
+                "value": "customer@example.com"
+              },
+              {
+                "key": "user-role",
+                "value": "customer"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"full_name\": \"John Doe\",\n  \"phone\": \"555-1234\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/customers"
+          }
+        },
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              },
+              {
+                "key": "user-email",
+                "value": "customer@example.com"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/customers?limit=10&offset=0"
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
+          }
+        },
+        {
+          "name": "Get Customer by User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/customers/by-user/{{user_id}}"
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"555-9999\",\n  \"photo_url\": \"https://example.com/new-photo.jpg\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trainer Profiles",
+      "item": [
+        {
+          "name": "Create Trainer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "660e8400-e29b-41d4-a716-446655440001"
+              },
+              {
+                "key": "user-email",
+                "value": "trainer@example.com"
+              },
+              {
+                "key": "user-role",
+                "value": "trainer"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"full_name\": \"Jane Smith\",\n  \"bio\": \"Certified fitness trainer with 10 years experience\",\n  \"specialty\": \"CrossFit\",\n  \"gender\": \"female\",\n  \"photo_url\": \"https://example.com/trainer-photo.jpg\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/trainers"
+          }
+        },
+        {
+          "name": "List Trainers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/trainers?limit=10&offset=0"
+          }
+        },
+        {
+          "name": "Get Trainer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
+          }
+        },
+        {
+          "name": "Get Trainer by User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "660e8400-e29b-41d4-a716-446655440001"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/trainers/by-user/660e8400-e29b-41d4-a716-446655440001"
+          }
+        },
+        {
+          "name": "Update Trainer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"specialty\": \"Yoga & Pilates\",\n  \"bio\": \"Updated bio here\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
+          }
+        },
+        {
+          "name": "Delete Trainer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Certifications",
+      "item": [
+        {
+          "name": "Create Certification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trainer_id\": \"{{trainer_id}}\",\n  \"title\": \"Certified Personal Trainer\",\n  \"issuer\": \"NASM\",\n  \"file_url\": \"https://example.com/cert.pdf\",\n  \"issued_date\": \"2022-06-15\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/certifications"
+          }
+        },
+        {
+          "name": "List Certifications for Trainer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}/certifications?limit=10&offset=0"
+          }
+        },
+        {
+          "name": "Get Certification by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
+          }
+        },
+        {
+          "name": "Update Certification",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_url\": \"https://example.com/updated-cert.pdf\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
+          }
+        },
+        {
+          "name": "Delete Certification",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
+          }
+        }
+      ]
+    }
+  ]
+}
