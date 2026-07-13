@@ -33,11 +33,20 @@ async function createCustomer(req, res, next) {
   }
 }
 
-async function getCustomer(req, res, next) {
+async function getCustomerByIdHandler(req, res, next) {
   try {
-    const profile = req.params.id
-      ? await getCustomerById(req.params.id)
-      : await getCustomerByUserId(req.query.user_id);
+    const profile = await getCustomerById(req.params.id);
+    if (!profile)
+      return res.status(404).json({ message: "Customer profile not found" });
+    res.json(profile);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getCustomerByUserIdHandler(req, res, next) {
+  try {
+    const profile = await getCustomerByUserId(req.params.user_id);
     if (!profile)
       return res.status(404).json({ message: "Customer profile not found" });
     res.json(profile);
@@ -87,11 +96,20 @@ async function createTrainer(req, res, next) {
   }
 }
 
-async function getTrainer(req, res, next) {
+async function getTrainerByIdHandler(req, res, next) {
   try {
-    const profile = req.params.id
-      ? await getTrainerById(req.params.id)
-      : await getTrainerByUserId(req.query.user_id);
+    const profile = await getTrainerById(req.params.id);
+    if (!profile)
+      return res.status(404).json({ message: "Trainer profile not found" });
+    res.json(profile);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getTrainerByUserIdHandler(req, res, next) {
+  try {
+    const profile = await getTrainerByUserId(req.params.user_id);
     if (!profile)
       return res.status(404).json({ message: "Trainer profile not found" });
     res.json(profile);
@@ -189,12 +207,14 @@ async function removeCertification(req, res, next) {
 
 module.exports = {
   createCustomer,
-  getCustomer,
+  getCustomerByIdHandler,
+  getCustomerByUserIdHandler,
   updateCustomerProfile,
   removeCustomer,
   listCustomerProfiles,
   createTrainer,
-  getTrainer,
+  getTrainerByIdHandler,
+  getTrainerByUserIdHandler,
   updateTrainerProfile,
   removeTrainer,
   listTrainerProfiles,

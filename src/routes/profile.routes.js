@@ -10,8 +10,8 @@ router.post(
   profileController.createCustomer,
 );
 router.get("/customers", profileController.listCustomerProfiles);
-router.get("/customers/:id", profileController.getCustomer);
-router.get("/customers/by-user/:user_id", profileController.getCustomer);
+router.get("/customers/:id", profileController.getCustomerByIdHandler);
+router.get("/customers/by-user/:user_id", profileController.getCustomerByUserIdHandler);
 router.put("/customers/:id", profileController.updateCustomerProfile);
 router.delete("/customers/:id", profileController.removeCustomer);
 
@@ -21,8 +21,8 @@ router.post(
   profileController.createTrainer,
 );
 router.get("/trainers", profileController.listTrainerProfiles);
-router.get("/trainers/:id", profileController.getTrainer);
-router.get("/trainers/by-user/:user_id", profileController.getTrainer);
+router.get("/trainers/:id", profileController.getTrainerByIdHandler);
+router.get("/trainers/by-user/:user_id", profileController.getTrainerByUserIdHandler);
 router.put("/trainers/:id", profileController.updateTrainerProfile);
 router.delete("/trainers/:id", profileController.removeTrainer);
 
