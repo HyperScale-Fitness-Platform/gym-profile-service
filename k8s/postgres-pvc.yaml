@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp-standard
+  resources:
+    requests:
+      storage: 10Gi
+
+# NOTE: This PVC is optional. The StatefulSet below uses a volumeClaimTemplate
+# which will create a pod-specific PVC automatically. Keep this file if you
+# prefer creating a single static PVC and binding it manually.
