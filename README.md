@@ -180,6 +180,33 @@ Manifests are in `k8s/`.
 - The Postgres StatefulSet expects a secret named `postgres-secret`.
 - The app deployment expects `DATABASE_URL` to be populated from a secret.
 
+## Continuous Integration
+
+The repository includes a `Jenkinsfile` for a Jenkins pipeline that can run locally.
+
+### Jenkins setup
+
+- Run a local Jenkins server with Docker available on the build agent.
+- Add a Jenkins credential of type `Username with password` and set the ID to `docker-hub`.
+- Provide Docker Hub credentials at runtime or via Jenkins job configuration.
+- Set the `DOCKER_IMAGE` build parameter to your target Docker Hub repository, for example:
+  - `your-dockerhub-username/gym-profile-service`
+
+### Pipeline steps
+
+1. Checkout repository
+2. Install dependencies with `npm ci`
+3. Lint the code
+4. Run tests
+5. Build Docker image
+6. Publish Docker image to Docker Hub (if `PUSH_IMAGE` is enabled)
+
+### Notes
+
+- The pipeline uses `docker login` with the `docker-hub` credentials.
+- If you do not want to push images, disable `PUSH_IMAGE`.
+- This branch does not hardcode image repository names; use the parameter to provide the correct Docker Hub repo.
+
 ## Project structure highlights
 
 - `src/app.js` — Express app definition for tests and runtime
