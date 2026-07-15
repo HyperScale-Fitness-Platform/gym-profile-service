@@ -5,6 +5,16 @@ metadata:
   labels:
     app: gym-profile-service
 spec:
+  initContainers:
+    - name: wait-for-postgres
+      image: busybox:1.35.0
+      imagePullPolicy: IfNotPresent
+      command:
+        [
+          "sh",
+          "-c",
+          "until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;",
+        ]
   replicas: 3
   selector:
     matchLabels:
