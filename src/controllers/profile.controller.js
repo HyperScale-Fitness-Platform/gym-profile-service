@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const {
   createCustomerProfile,
   getCustomerById,
@@ -89,13 +90,24 @@ async function listCustomerProfiles(req, res, next) {
 
 async function createTrainer(req, res, next) {
   try {
-    const profile = await createTrainerProfile(req.body);
+    const { password, ...otherData } = req.body;
+    
+    // Hash password before db insertion
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const profile = await createTrainerProfile({
+      ...otherData,
+      password: hashedPassword
+    });
+
+    // Defensively strip password from the response object
+    delete profile.password;
+
     res.status(201).json(profile);
   } catch (error) {
     next(error);
   }
 }
-
 async function getTrainerByIdHandler(req, res, next) {
   try {
     const profile = await getTrainerById(req.params.id);
@@ -120,9 +132,19 @@ async function getTrainerByUserIdHandler(req, res, next) {
 
 async function updateTrainerProfile(req, res, next) {
   try {
-    const profile = await updateTrainer(req.params.id, req.body);
-    if (!profile)
+    const updateData = { ...req.body };
+
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    const profile = await updateTrainer(req.params.id, updateData);
+    
+    if (!profile) {
       return res.status(404).json({ message: "Trainer profile not found" });
+    }
+
+    delete profile.password;
     res.json(profile);
   } catch (error) {
     next(error);
@@ -140,10 +162,7 @@ async function removeTrainer(req, res, next) {
 
 async function listTrainerProfiles(req, res, next) {
   try {
-    const profiles = await listTrainers({
-      limit: req.query.limit,
-      offset: req.query.offset,
-    });
+    const profiles = await listTrainers();
     res.json(profiles);
   } catch (error) {
     next(error);

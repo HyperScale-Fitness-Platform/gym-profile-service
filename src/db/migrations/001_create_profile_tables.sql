@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS customer_profiles (
 
 CREATE TABLE IF NOT EXISTS trainer_profiles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL UNIQUE,
+  email text UNIQUE NOT NULL,
+  password text NOT NULL,
   full_name text NOT NULL,
   bio text,
-  specialty text,
   gender text,
   photo_url text
 );

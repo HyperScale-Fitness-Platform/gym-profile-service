@@ -15,14 +15,15 @@ router.get("/customers/by-user/:user_id", profileController.getCustomerByUserIdH
 router.put("/customers/:id", profileController.updateCustomerProfile);
 router.delete("/customers/:id", profileController.removeCustomer);
 
+// --- TRAINER ROUTES UPDATED ---
 router.post(
   "/trainers",
-  validateRequest(["user_id", "full_name"]),
+  validateRequest(["email", "password", "full_name"]), // Updated required fields
   profileController.createTrainer,
 );
 router.get("/trainers", profileController.listTrainerProfiles);
 router.get("/trainers/:id", profileController.getTrainerByIdHandler);
-router.get("/trainers/by-user/:user_id", profileController.getTrainerByUserIdHandler);
+// Removed: router.get("/trainers/by-user/:user_id" ...)
 router.put("/trainers/:id", profileController.updateTrainerProfile);
 router.delete("/trainers/:id", profileController.removeTrainer);
 
