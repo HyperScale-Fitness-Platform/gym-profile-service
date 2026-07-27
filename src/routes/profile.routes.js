@@ -2,6 +2,10 @@ const express = require("express");
 const profileController = require("../controllers/profile.controller");
 const validateRequest = require("../middleware/validateRequest.middleware");
 const { authorizeSelfOrRole } = require("../middleware/role.middleware");
+const {
+  loadCustomerProfile,
+  authorizeProfileOwnerOrRole,
+} = require("../middleware/profileAccess.middleware");
 
 const router = express.Router();
 
@@ -19,12 +23,14 @@ router.get(
 );
 router.put(
   "/customers/:id",
-  authorizeSelfOrRole(["admin"], ["body.user_id"]),
+  loadCustomerProfile,
+  authorizeProfileOwnerOrRole(["admin"]),
   profileController.updateCustomerProfile,
 );
 router.delete(
   "/customers/:id",
-  authorizeSelfOrRole(["admin"], ["body.user_id"]),
+  loadCustomerProfile,
+  authorizeProfileOwnerOrRole(["admin"]),
   profileController.removeCustomer,
 );
 
