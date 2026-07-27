@@ -1,5 +1,5 @@
 {
-  "name": "gym-name-service",
+  "name": "gym-profile-service",
   "version": "1.0.0",
   "description": "Gym Microservice template standard",
   "main": "src/index.js",
