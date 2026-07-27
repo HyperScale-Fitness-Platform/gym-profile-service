@@ -4,6 +4,7 @@ const validateRequest = require("../middleware/validateRequest.middleware");
 const { authorizeSelfOrRole } = require("../middleware/role.middleware");
 const {
   loadCustomerProfile,
+  loadTrainerProfile,
   authorizeProfileOwnerOrRole,
 } = require("../middleware/profileAccess.middleware");
 
@@ -48,12 +49,14 @@ router.get(
 );
 router.put(
   "/trainers/:id",
-  authorizeSelfOrRole(["admin"], ["body.user_id"]),
+  loadTrainerProfile,
+  authorizeProfileOwnerOrRole(["admin"]),
   profileController.updateTrainerProfile,
 );
 router.delete(
   "/trainers/:id",
-  authorizeSelfOrRole(["admin"], ["body.user_id"]),
+  loadTrainerProfile,
+  authorizeProfileOwnerOrRole(["admin"]),
   profileController.removeTrainer,
 );
 
