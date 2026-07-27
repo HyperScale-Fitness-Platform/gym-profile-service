@@ -31,12 +31,16 @@ const {
   createCustomerProfile,
   getCustomerById,
   getCustomerByUserId,
+  updateCustomer,
+  deleteCustomer,
 } = require("../../src/models/customerProfile.model");
 
 const {
   createTrainerProfile,
   getTrainerById,
   getTrainerByUserId,
+  updateTrainer,
+  deleteTrainer,
 } = require("../../src/models/trainerProfile.model");
 
 const {
@@ -56,7 +60,8 @@ describe("Integration: /api/profiles/customers", () => {
 
     const response = await request(app)
       .post("/api/profiles/customers")
-      .set("user-id", "test-user")
+      .set("user-id", "user-123")
+      .set("user-role", "customer")
       .send({ user_id: "user-123", full_name: "Jane Doe" });
 
     expect(response.status).toBe(201);
@@ -65,6 +70,17 @@ describe("Integration: /api/profiles/customers", () => {
       user_id: "user-123",
       full_name: "Jane Doe",
     });
+  });
+
+  it("should reject creating a profile for another user id", async () => {
+    const response = await request(app)
+      .post("/api/profiles/customers")
+      .set("user-id", "user-123")
+      .set("user-role", "customer")
+      .send({ user_id: "someone-else", full_name: "Jane Doe" });
+
+    expect(response.status).toBe(403);
+    expect(createCustomerProfile).not.toHaveBeenCalled();
   });
 
   it("should return 404 when customer not found by id", async () => {
@@ -90,6 +106,91 @@ describe("Integration: /api/profiles/customers", () => {
     expect(response.body).toEqual(profile);
     expect(getCustomerByUserId).toHaveBeenCalledWith("user-123");
   });
+
+  it("should allow the owner to update their own profile", async () => {
+    const stored = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    const updated = { ...stored, phone: "555-9999" };
+    getCustomerById.mockResolvedValue(stored);
+    updateCustomer.mockResolvedValue(updated);
+
+    const response = await request(app)
+      .put("/api/profiles/customers/abc")
+      .set("user-id", "user-123")
+      .set("user-role", "customer")
+      .send({ phone: "555-9999" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(updated);
+    expect(updateCustomer).toHaveBeenCalledWith("abc", { phone: "555-9999" });
+  });
+
+  it("should allow an admin to update any customer profile", async () => {
+    const stored = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    getCustomerById.mockResolvedValue(stored);
+    updateCustomer.mockResolvedValue({ ...stored, phone: "555-0000" });
+
+    const response = await request(app)
+      .put("/api/profiles/customers/abc")
+      .set("user-id", "admin-1")
+      .set("user-role", "admin")
+      .send({ phone: "555-0000" });
+
+    expect(response.status).toBe(200);
+  });
+
+  it("should reject a non-owner, non-admin update", async () => {
+    const stored = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    getCustomerById.mockResolvedValue(stored);
+
+    const response = await request(app)
+      .put("/api/profiles/customers/abc")
+      .set("user-id", "some-other-user")
+      .set("user-role", "customer")
+      .send({ phone: "555-0000" });
+
+    expect(response.status).toBe(403);
+    expect(updateCustomer).not.toHaveBeenCalled();
+  });
+
+  it("should return 404 when updating a profile that does not exist", async () => {
+    getCustomerById.mockResolvedValue(null);
+
+    const response = await request(app)
+      .put("/api/profiles/customers/missing")
+      .set("user-id", "user-123")
+      .set("user-role", "customer")
+      .send({ phone: "555-0000" });
+
+    expect(response.status).toBe(404);
+    expect(updateCustomer).not.toHaveBeenCalled();
+  });
+
+  it("should allow the owner to delete their own profile", async () => {
+    const stored = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    getCustomerById.mockResolvedValue(stored);
+    deleteCustomer.mockResolvedValue();
+
+    const response = await request(app)
+      .delete("/api/profiles/customers/abc")
+      .set("user-id", "user-123")
+      .set("user-role", "customer");
+
+    expect(response.status).toBe(204);
+    expect(deleteCustomer).toHaveBeenCalledWith("abc");
+  });
+
+  it("should reject a non-owner, non-admin delete", async () => {
+    const stored = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    getCustomerById.mockResolvedValue(stored);
+
+    const response = await request(app)
+      .delete("/api/profiles/customers/abc")
+      .set("user-id", "some-other-user")
+      .set("user-role", "customer");
+
+    expect(response.status).toBe(403);
+    expect(deleteCustomer).not.toHaveBeenCalled();
+  });
 });
 
 describe("Integration: /api/profiles/trainers", () => {
@@ -103,7 +204,8 @@ describe("Integration: /api/profiles/trainers", () => {
 
     const response = await request(app)
       .post("/api/profiles/trainers")
-      .set("user-id", "test-user")
+      .set("user-id", "trainer-123")
+      .set("user-role", "trainer")
       .send({ user_id: "trainer-123", full_name: "Alex" });
 
     expect(response.status).toBe(201);
@@ -139,6 +241,49 @@ describe("Integration: /api/profiles/trainers", () => {
     expect(response.body).toEqual(profile);
     expect(getTrainerByUserId).toHaveBeenCalledWith("trainer-123");
   });
+
+  it("should allow the owner to update their own trainer profile", async () => {
+    const stored = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+    getTrainerById.mockResolvedValue(stored);
+    updateTrainer.mockResolvedValue({ ...stored, specialty: "Yoga" });
+
+    const response = await request(app)
+      .put("/api/profiles/trainers/t1")
+      .set("user-id", "trainer-123")
+      .set("user-role", "trainer")
+      .send({ specialty: "Yoga" });
+
+    expect(response.status).toBe(200);
+    expect(updateTrainer).toHaveBeenCalledWith("t1", { specialty: "Yoga" });
+  });
+
+  it("should reject a non-owner, non-admin trainer update", async () => {
+    const stored = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+    getTrainerById.mockResolvedValue(stored);
+
+    const response = await request(app)
+      .put("/api/profiles/trainers/t1")
+      .set("user-id", "some-other-user")
+      .set("user-role", "trainer")
+      .send({ specialty: "Yoga" });
+
+    expect(response.status).toBe(403);
+    expect(updateTrainer).not.toHaveBeenCalled();
+  });
+
+  it("should allow the owner to delete their own trainer profile", async () => {
+    const stored = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+    getTrainerById.mockResolvedValue(stored);
+    deleteTrainer.mockResolvedValue();
+
+    const response = await request(app)
+      .delete("/api/profiles/trainers/t1")
+      .set("user-id", "trainer-123")
+      .set("user-role", "trainer");
+
+    expect(response.status).toBe(204);
+    expect(deleteTrainer).toHaveBeenCalledWith("t1");
+  });
 });
 
 describe("Integration: /api/profiles/certifications", () => {
@@ -152,7 +297,8 @@ describe("Integration: /api/profiles/certifications", () => {
 
     const response = await request(app)
       .post("/api/profiles/certifications")
-      .set("user-id", "test-user")
+      .set("user-id", "t1")
+      .set("user-role", "trainer")
       .send({ trainer_id: "t1", title: "Cert A" });
 
     expect(response.status).toBe(201);
