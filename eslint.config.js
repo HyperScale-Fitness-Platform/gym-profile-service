@@ -1,21 +1,16 @@
-// eslint.config.js
 const js = require("@eslint/js");
+const globals = require("globals");
 
 module.exports = [
   js.configs.recommended,
   {
     languageOptions: {
       ecmaVersion: "latest",
-      sourceType: "commonjs", // or "module" if you're using ESM/import syntax
+      sourceType: "commonjs",
       globals: {
-        require: "readonly",
-        module: "readonly",
-        process: "readonly",
-        console: "readonly",
+        ...globals.node,
       },
     },
-    rules: {
-      // carry over any custom rules from your old .eslintrc here
-    },
+    rules: {},
   },
 ];
