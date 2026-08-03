@@ -64,6 +64,10 @@ async function listCustomers({ limit = 50, offset = 0 } = {}) {
   return res.rows;
 }
 
+async function deleteCustomerProfile(id) {
+  await pool.query("DELETE FROM customer_profiles WHERE id = $1", [id]);
+}
+
 module.exports = {
   createCustomerProfile,
   getCustomerById,
@@ -71,4 +75,5 @@ module.exports = {
   updateCustomer,
   deleteCustomer,
   listCustomers,
+  deleteCustomerProfile
 };

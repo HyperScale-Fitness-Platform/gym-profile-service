@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const {
   createCustomerProfile,
   getCustomerById,
@@ -132,19 +132,13 @@ async function getTrainerByUserIdHandler(req, res, next) {
 
 async function updateTrainerProfile(req, res, next) {
   try {
-    const updateData = { ...req.body };
 
-    if (updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10);
-    }
-
-    const profile = await updateTrainer(req.params.id, updateData);
+    const profile = await updateTrainer(req.params.id, req.body);
     
     if (!profile) {
       return res.status(404).json({ message: "Trainer profile not found" });
     }
 
-    delete profile.password;
     res.json(profile);
   } catch (error) {
     next(error);
