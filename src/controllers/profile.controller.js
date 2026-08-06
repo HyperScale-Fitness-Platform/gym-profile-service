@@ -1,8 +1,7 @@
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const {
   createCustomerProfile,
   getCustomerById,
-  getCustomerByUserId,
   updateCustomer,
   deleteCustomer,
   listCustomers,
@@ -11,7 +10,6 @@ const {
 const {
   createTrainerProfile,
   getTrainerById,
-  getTrainerByUserId,
   updateTrainer,
   deleteTrainer,
   listTrainers,
@@ -37,17 +35,6 @@ async function createCustomer(req, res, next) {
 async function getCustomerByIdHandler(req, res, next) {
   try {
     const profile = await getCustomerById(req.params.id);
-    if (!profile)
-      return res.status(404).json({ message: "Customer profile not found" });
-    res.json(profile);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function getCustomerByUserIdHandler(req, res, next) {
-  try {
-    const profile = await getCustomerByUserId(req.params.user_id);
     if (!profile)
       return res.status(404).json({ message: "Customer profile not found" });
     res.json(profile);
@@ -111,17 +98,6 @@ async function createTrainer(req, res, next) {
 async function getTrainerByIdHandler(req, res, next) {
   try {
     const profile = await getTrainerById(req.params.id);
-    if (!profile)
-      return res.status(404).json({ message: "Trainer profile not found" });
-    res.json(profile);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function getTrainerByUserIdHandler(req, res, next) {
-  try {
-    const profile = await getTrainerByUserId(req.params.user_id);
     if (!profile)
       return res.status(404).json({ message: "Trainer profile not found" });
     res.json(profile);
@@ -221,13 +197,11 @@ async function removeCertification(req, res, next) {
 module.exports = {
   createCustomer,
   getCustomerByIdHandler,
-  getCustomerByUserIdHandler,
   updateCustomerProfile,
   removeCustomer,
   listCustomerProfiles,
   createTrainer,
   getTrainerByIdHandler,
-  getTrainerByUserIdHandler,
   updateTrainerProfile,
   removeTrainer,
   listTrainerProfiles,

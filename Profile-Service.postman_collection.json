@@ -78,7 +78,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"full_name\": \"John Doe\",\n  \"phone\": \"555-1234\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
+              "raw": "{\n  \"id\": \"{{user_id}}\",\n  \"full_name\": \"John Doe\",\n  \"gender\": \"male\",\n  \"phone\": \"555-1234\"\n}"
             },
             "url": "{{base_url}}/api/profiles/customers"
           }
@@ -114,19 +114,6 @@
           }
         },
         {
-          "name": "Get Customer by User ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
-            "url": "{{base_url}}/api/profiles/customers/by-user/{{user_id}}"
-          }
-        },
-        {
           "name": "Update Customer",
           "request": {
             "method": "PUT",
@@ -142,7 +129,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"555-9999\",\n  \"photo_url\": \"https://example.com/new-photo.jpg\"\n}"
+              "raw": "{\n  \"full_name\": \"John Doe\",\n  \"gender\": \"male\",\n  \"phone\": \"555-9999\"\n}"
             },
             "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
           }
@@ -189,7 +176,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"user_id\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"full_name\": \"Jane Smith\",\n  \"bio\": \"Certified fitness trainer with 10 years experience\",\n  \"specialty\": \"CrossFit\",\n  \"gender\": \"female\",\n  \"photo_url\": \"https://example.com/trainer-photo.jpg\"\n}"
+              "raw": "{\n  \"id\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"full_name\": \"Jane Smith\",\n  \"bio\": \"Certified fitness trainer with 10 years experience\",\n  \"gender\": \"female\",\n  \"photo_url\": \"https://example.com/trainer-photo.jpg\"\n}"
             },
             "url": "{{base_url}}/api/profiles/trainers"
           }
@@ -218,19 +205,6 @@
               }
             ],
             "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
-          }
-        },
-        {
-          "name": "Get Trainer by User ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "660e8400-e29b-41d4-a716-446655440001"
-              }
-            ],
-            "url": "{{base_url}}/api/profiles/trainers/by-user/660e8400-e29b-41d4-a716-446655440001"
           }
         },
         {

@@ -4,7 +4,6 @@ const app = require("../../src/app");
 jest.mock("../../src/models/customerProfile.model", () => ({
   createCustomerProfile: jest.fn(),
   getCustomerById: jest.fn(),
-  getCustomerByUserId: jest.fn(),
   updateCustomer: jest.fn(),
   deleteCustomer: jest.fn(),
   listCustomers: jest.fn(),
@@ -13,7 +12,6 @@ jest.mock("../../src/models/customerProfile.model", () => ({
 jest.mock("../../src/models/trainerProfile.model", () => ({
   createTrainerProfile: jest.fn(),
   getTrainerById: jest.fn(),
-  getTrainerByUserId: jest.fn(),
   updateTrainer: jest.fn(),
   deleteTrainer: jest.fn(),
   listTrainers: jest.fn(),
@@ -30,13 +28,13 @@ jest.mock("../../src/models/certification.model", () => ({
 const {
   createCustomerProfile,
   getCustomerById,
-  getCustomerByUserId,
+  listCustomers,
 } = require("../../src/models/customerProfile.model");
 
 const {
   createTrainerProfile,
   getTrainerById,
-  getTrainerByUserId,
+  listTrainers,
 } = require("../../src/models/trainerProfile.model");
 
 const {
@@ -51,19 +49,31 @@ describe("Integration: /api/profiles/customers", () => {
   });
 
   it("should create a customer profile", async () => {
-    const profile = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+    const profile = {
+      id: "user-123",
+      full_name: "Jane Doe",
+      gender: "female",
+      phone: "555-1234",
+    };
     createCustomerProfile.mockResolvedValue(profile);
 
     const response = await request(app)
       .post("/api/profiles/customers")
       .set("user-id", "test-user")
-      .send({ user_id: "user-123", full_name: "Jane Doe" });
+      .send({
+        id: "user-123",
+        full_name: "Jane Doe",
+        gender: "female",
+        phone: "555-1234",
+      });
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual(profile);
     expect(createCustomerProfile).toHaveBeenCalledWith({
-      user_id: "user-123",
+      id: "user-123",
       full_name: "Jane Doe",
+      gender: "female",
+      phone: "555-1234",
     });
   });
 
@@ -78,17 +88,24 @@ describe("Integration: /api/profiles/customers", () => {
     expect(response.body).toEqual({ message: "Customer profile not found" });
   });
 
-  it("should return a customer profile by user_id", async () => {
-    const profile = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
-    getCustomerByUserId.mockResolvedValue(profile);
+  it("should list customer profiles", async () => {
+    const profiles = [
+      {
+        id: "user-123",
+        full_name: "Jane Doe",
+        gender: "female",
+        phone: "555-1234",
+      },
+    ];
+    listCustomers.mockResolvedValue(profiles);
 
     const response = await request(app)
-      .get("/api/profiles/customers/by-user/user-123")
+      .get("/api/profiles/customers")
       .set("user-id", "test-user");
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(profile);
-    expect(getCustomerByUserId).toHaveBeenCalledWith("user-123");
+    expect(response.body).toEqual(profiles);
+    expect(listCustomers).toHaveBeenCalledWith({ limit: undefined, offset: undefined });
   });
 });
 
@@ -98,24 +115,23 @@ describe("Integration: /api/profiles/trainers", () => {
   });
 
   it("should create a trainer profile", async () => {
-    const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+    const profile = { id: "t1", full_name: "Alex" };
     createTrainerProfile.mockResolvedValue(profile);
 
     const response = await request(app)
       .post("/api/profiles/trainers")
       .set("user-id", "test-user")
-      .send({ user_id: "trainer-123", full_name: "Alex" });
+      .send({ id: "t1", email: "alex@example.com", password: "secret", full_name: "Alex" });
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual(profile);
-    expect(createTrainerProfile).toHaveBeenCalledWith({
-      user_id: "trainer-123",
-      full_name: "Alex",
-    });
+    expect(createTrainerProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "t1", full_name: "Alex" }),
+    );
   });
 
   it("should return a trainer profile by id", async () => {
-    const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+    const profile = { id: "t1", full_name: "Alex" };
     getTrainerById.mockResolvedValue(profile);
 
     const response = await request(app)
@@ -127,17 +143,17 @@ describe("Integration: /api/profiles/trainers", () => {
     expect(getTrainerById).toHaveBeenCalledWith("t1");
   });
 
-  it("should return a trainer profile by user_id", async () => {
-    const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
-    getTrainerByUserId.mockResolvedValue(profile);
+  it("should list trainer profiles", async () => {
+    const profiles = [{ id: "t1", full_name: "Alex" }];
+    listTrainers.mockResolvedValue(profiles);
 
     const response = await request(app)
-      .get("/api/profiles/trainers/by-user/trainer-123")
+      .get("/api/profiles/trainers")
       .set("user-id", "test-user");
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(profile);
-    expect(getTrainerByUserId).toHaveBeenCalledWith("trainer-123");
+    expect(response.body).toEqual(profiles);
+    expect(listTrainers).toHaveBeenCalled();
   });
 });
 

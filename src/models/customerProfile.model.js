@@ -1,17 +1,15 @@
 const { pool } = require("../config/database");
 
 async function createCustomerProfile({
-  user_id,
+  id,
   full_name,
   phone,
-  date_of_birth,
   gender,
-  photo_url,
 }) {
   const res = await pool.query(
-    `INSERT INTO customer_profiles (user_id, full_name, phone, date_of_birth, gender, photo_url)
-     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [user_id, full_name, phone, date_of_birth, gender, photo_url],
+    `INSERT INTO customer_profiles (id,full_name, phone, gender)
+     VALUES ($1,$2,$3,$4) RETURNING *`,
+    [id, full_name, phone, gender],
   );
   return res.rows[0];
 }
@@ -23,22 +21,8 @@ async function getCustomerById(id) {
   return res.rows[0] || null;
 }
 
-async function getCustomerByUserId(user_id) {
-  const res = await pool.query(
-    "SELECT * FROM customer_profiles WHERE user_id=$1",
-    [user_id],
-  );
-  return res.rows[0] || null;
-}
-
 async function updateCustomer(id, fields = {}) {
-  const allowed = [
-    "full_name",
-    "phone",
-    "date_of_birth",
-    "gender",
-    "photo_url",
-  ];
+  const allowed = ["full_name", "phone", "gender"];
   const keys = Object.keys(fields).filter((k) => allowed.includes(k));
   if (keys.length === 0) return getCustomerById(id);
 
@@ -71,7 +55,6 @@ async function deleteCustomerProfile(id) {
 module.exports = {
   createCustomerProfile,
   getCustomerById,
-  getCustomerByUserId,
   updateCustomer,
   deleteCustomer,
   listCustomers,

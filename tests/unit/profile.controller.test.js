@@ -1,13 +1,11 @@
 const {
   createCustomer,
   getCustomerByIdHandler,
-  getCustomerByUserIdHandler,
 } = require("../../src/controllers/profile.controller");
 
 jest.mock("../../src/models/customerProfile.model", () => ({
   createCustomerProfile: jest.fn(),
   getCustomerById: jest.fn(),
-  getCustomerByUserId: jest.fn(),
   updateCustomer: jest.fn(),
   deleteCustomer: jest.fn(),
   listCustomers: jest.fn(),
@@ -16,7 +14,6 @@ jest.mock("../../src/models/customerProfile.model", () => ({
 jest.mock("../../src/models/trainerProfile.model", () => ({
   createTrainerProfile: jest.fn(),
   getTrainerById: jest.fn(),
-  getTrainerByUserId: jest.fn(),
   updateTrainer: jest.fn(),
   deleteTrainer: jest.fn(),
   listTrainers: jest.fn(),
@@ -33,7 +30,6 @@ jest.mock("../../src/models/certification.model", () => ({
 const {
   createCustomerProfile,
   getCustomerById,
-  getCustomerByUserId,
 } = require("../../src/models/customerProfile.model");
 
 describe("profile.controller", () => {
@@ -51,10 +47,22 @@ describe("profile.controller", () => {
 
   describe("createCustomer", () => {
     it("should create a customer profile and return 201", async () => {
-      const profile = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+      const profile = {
+        id: "user-123",
+        full_name: "Jane Doe",
+        gender: "female",
+        phone: "555-1234",
+      };
       createCustomerProfile.mockResolvedValue(profile);
 
-      const req = { body: { user_id: "user-123", full_name: "Jane Doe" } };
+      const req = {
+        body: {
+          id: "user-123",
+          full_name: "Jane Doe",
+          gender: "female",
+          phone: "555-1234",
+        },
+      };
 
       await createCustomer(req, res, next);
 
@@ -68,7 +76,9 @@ describe("profile.controller", () => {
       const error = new Error("create failed");
       createCustomerProfile.mockRejectedValue(error);
 
-      const req = { body: { user_id: "user-123", full_name: "Jane Doe" } };
+      const req = {
+        body: { id: "user-123", full_name: "Jane Doe", gender: "female" },
+      };
 
       await createCustomer(req, res, next);
 
@@ -78,14 +88,19 @@ describe("profile.controller", () => {
 
   describe("getCustomerByIdHandler", () => {
     it("should return the customer profile when found", async () => {
-      const profile = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
+      const profile = {
+        id: "user-123",
+        full_name: "Jane Doe",
+        gender: "female",
+        phone: "555-1234",
+      };
       getCustomerById.mockResolvedValue(profile);
 
-      const req = { params: { id: "abc" } };
+      const req = { params: { id: "user-123" } };
 
       await getCustomerByIdHandler(req, res, next);
 
-      expect(getCustomerById).toHaveBeenCalledWith("abc");
+      expect(getCustomerById).toHaveBeenCalledWith("user-123");
       expect(res.json).toHaveBeenCalledWith(profile);
       expect(next).not.toHaveBeenCalled();
     });
@@ -107,48 +122,9 @@ describe("profile.controller", () => {
       const error = new Error("lookup failed");
       getCustomerById.mockRejectedValue(error);
 
-      const req = { params: { id: "abc" } };
+      const req = { params: { id: "user-123" } };
 
       await getCustomerByIdHandler(req, res, next);
-
-      expect(next).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe("getCustomerByUserIdHandler", () => {
-    it("should return the customer profile when found by user_id", async () => {
-      const profile = { id: "abc", user_id: "user-123", full_name: "Jane Doe" };
-      getCustomerByUserId.mockResolvedValue(profile);
-
-      const req = { params: { user_id: "user-123" } };
-
-      await getCustomerByUserIdHandler(req, res, next);
-
-      expect(getCustomerByUserId).toHaveBeenCalledWith("user-123");
-      expect(res.json).toHaveBeenCalledWith(profile);
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    it("should return 404 when the profile is not found by user_id", async () => {
-      getCustomerByUserId.mockResolvedValue(null);
-
-      const req = { params: { user_id: "user-123" } };
-
-      await getCustomerByUserIdHandler(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        message: "Customer profile not found",
-      });
-    });
-
-    it("should forward errors to next", async () => {
-      const error = new Error("lookup failed");
-      getCustomerByUserId.mockRejectedValue(error);
-
-      const req = { params: { user_id: "user-123" } };
-
-      await getCustomerByUserIdHandler(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
@@ -158,14 +134,15 @@ describe("profile.controller", () => {
     const {
       createTrainerProfile,
       getTrainerById,
-      getTrainerByUserId,
     } = require("../../src/models/trainerProfile.model");
 
     it("should create a trainer profile and return 201", async () => {
-      const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+      const profile = { id: "t1", full_name: "Alex" };
       createTrainerProfile.mockResolvedValue(profile);
 
-      const req = { body: { user_id: "trainer-123", full_name: "Alex" } };
+      const req = {
+        body: { id: "t1", email: "alex@example.com", password: "secret", full_name: "Alex" },
+      };
 
       await require("../../src/controllers/profile.controller").createTrainer(
         req,
@@ -173,14 +150,17 @@ describe("profile.controller", () => {
         next,
       );
 
-      expect(createTrainerProfile).toHaveBeenCalledWith(req.body);
+      expect(createTrainerProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "t1", full_name: "Alex" }),
+      );
+      expect(createTrainerProfile.mock.calls[0][0].password).not.toBe("secret");
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(profile);
       expect(next).not.toHaveBeenCalled();
     });
 
     it("should return trainer profile by id", async () => {
-      const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
+      const profile = { id: "t1", full_name: "Alex" };
       getTrainerById.mockResolvedValue(profile);
 
       const req = { params: { id: "t1" } };
@@ -192,22 +172,6 @@ describe("profile.controller", () => {
       );
 
       expect(getTrainerById).toHaveBeenCalledWith("t1");
-      expect(res.json).toHaveBeenCalledWith(profile);
-    });
-
-    it("should return trainer profile by user_id", async () => {
-      const profile = { id: "t1", user_id: "trainer-123", full_name: "Alex" };
-      getTrainerByUserId.mockResolvedValue(profile);
-
-      const req = { params: { user_id: "trainer-123" } };
-
-      await require("../../src/controllers/profile.controller").getTrainerByUserIdHandler(
-        req,
-        res,
-        next,
-      );
-
-      expect(getTrainerByUserId).toHaveBeenCalledWith("trainer-123");
       expect(res.json).toHaveBeenCalledWith(profile);
     });
   });

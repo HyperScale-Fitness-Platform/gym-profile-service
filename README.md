@@ -110,7 +110,6 @@ http://localhost:3000/api/profiles
 - `POST /api/profiles/customers`
 - `GET /api/profiles/customers`
 - `GET /api/profiles/customers/:id`
-- `GET /api/profiles/customers/by-user/:user_id`
 - `PUT /api/profiles/customers/:id`
 - `DELETE /api/profiles/customers/:id`
 
@@ -119,7 +118,6 @@ http://localhost:3000/api/profiles
 - `POST /api/profiles/trainers`
 - `GET /api/profiles/trainers`
 - `GET /api/profiles/trainers/:id`
-- `GET /api/profiles/trainers/by-user/:user_id`
 - `PUT /api/profiles/trainers/:id`
 - `DELETE /api/profiles/trainers/:id`
 

@@ -6,12 +6,11 @@ const router = express.Router();
 
 router.post(
   "/customers",
-  validateRequest(["user_id", "full_name"]),
+  validateRequest(["id", "full_name"]),
   profileController.createCustomer,
 );
 router.get("/customers", profileController.listCustomerProfiles);
 router.get("/customers/:id", profileController.getCustomerByIdHandler);
-router.get("/customers/by-user/:user_id", profileController.getCustomerByUserIdHandler);
 router.put("/customers/:id", profileController.updateCustomerProfile);
 router.delete("/customers/:id", profileController.removeCustomer);
 
