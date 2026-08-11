@@ -69,7 +69,7 @@ async function migrate() {
     try {
       const LOCK_KEY = 1234567890;
       await client.query("SELECT pg_advisory_unlock($1)", [LOCK_KEY]);
-    } catch (err) {
+    } catch {
       // ignore unlock errors
     }
     client.release();

@@ -6,31 +6,12 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:3000",
-      "type": "string"
-    },
-    {
-      "key": "user_id",
-      "value": "550e8400-e29b-41d4-a716-446655440000",
-      "type": "string"
-    },
-    {
-      "key": "customer_id",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "trainer_id",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "cert_id",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "user_id", "value": "550e8400-e29b-41d4-a716-446655440000", "type": "string" },
+    { "key": "customer_id", "value": "", "type": "string" },
+    { "key": "trainer_user_id", "value": "660e8400-e29b-41d4-a716-446655440001", "type": "string" },
+    { "key": "trainer_id", "value": "", "type": "string" },
+    { "key": "cert_id", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -40,12 +21,7 @@
           "name": "Health Check",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/health"
           }
         }
@@ -59,22 +35,10 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              },
-              {
-                "key": "user-email",
-                "value": "customer@example.com"
-              },
-              {
-                "key": "user-role",
-                "value": "customer"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "{{user_id}}" },
+              { "key": "user-email", "value": "customer@example.com" },
+              { "key": "user-role", "value": "customer" }
             ],
             "body": {
               "mode": "raw",
@@ -87,16 +51,7 @@
           "name": "List Customers",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              },
-              {
-                "key": "user-email",
-                "value": "customer@example.com"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/customers?limit=10&offset=0"
           }
         },
@@ -104,12 +59,7 @@
           "name": "Get Customer by ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
           }
         },
@@ -118,14 +68,9 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "{{user_id}}" },
+              { "key": "user-role", "value": "customer" }
             ],
             "body": {
               "mode": "raw",
@@ -135,14 +80,44 @@
           }
         },
         {
+          "name": "Update Customer (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "admin-user-1" },
+              { "key": "user-role", "value": "admin" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"555-0000\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
+          }
+        },
+        {
+          "name": "Update Customer (forbidden - wrong owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "some-other-user" },
+              { "key": "user-role", "value": "customer" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"555-0000\"\n}"
+            },
+            "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
+          }
+        },
+        {
           "name": "Delete Customer",
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "user-id", "value": "{{user_id}}" },
+              { "key": "user-role", "value": "customer" }
             ],
             "url": "{{base_url}}/api/profiles/customers/{{customer_id}}"
           }
@@ -157,22 +132,10 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "660e8400-e29b-41d4-a716-446655440001"
-              },
-              {
-                "key": "user-email",
-                "value": "trainer@example.com"
-              },
-              {
-                "key": "user-role",
-                "value": "trainer"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "{{trainer_user_id}}" },
+              { "key": "user-email", "value": "trainer@example.com" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "body": {
               "mode": "raw",
@@ -185,12 +148,7 @@
           "name": "List Trainers",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/trainers?limit=10&offset=0"
           }
         },
@@ -198,12 +156,7 @@
           "name": "Get Trainer by ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
           }
         },
@@ -212,18 +165,13 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "some-other-user" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"specialty\": \"Yoga & Pilates\",\n  \"bio\": \"Updated bio here\"\n}"
+              "raw": "{\n  \"specialty\": \"Yoga & Pilates\"\n}"
             },
             "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
           }
@@ -233,10 +181,8 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "user-id", "value": "{{trainer_user_id}}" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}"
           }
@@ -251,14 +197,9 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "{{trainer_id}}" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "body": {
               "mode": "raw",
@@ -271,12 +212,7 @@
           "name": "List Certifications for Trainer",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/trainers/{{trainer_id}}/certifications?limit=10&offset=0"
           }
         },
@@ -284,12 +220,7 @@
           "name": "Get Certification by ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
-            ],
+            "header": [{ "key": "user-id", "value": "{{user_id}}" }],
             "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
           }
         },
@@ -298,18 +229,13 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "user-id", "value": "{{trainer_id}}" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"file_url\": \"https://example.com/updated-cert.pdf\"\n}"
+              "raw": "{\n  \"trainer_id\": \"{{trainer_id}}\",\n  \"file_url\": \"https://example.com/updated-cert.pdf\"\n}"
             },
             "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
           }
@@ -319,10 +245,8 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "user-id",
-                "value": "{{user_id}}"
-              }
+              { "key": "user-id", "value": "{{trainer_id}}" },
+              { "key": "user-role", "value": "trainer" }
             ],
             "url": "{{base_url}}/api/profiles/certifications/{{cert_id}}"
           }

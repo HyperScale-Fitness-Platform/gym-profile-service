@@ -1,6 +1,12 @@
 const express = require("express");
 const profileController = require("../controllers/profile.controller");
 const validateRequest = require("../middleware/validateRequest.middleware");
+const { authorizeSelfOrRole } = require("../middleware/role.middleware");
+const {
+  loadCustomerProfile,
+  loadTrainerProfile,
+  authorizeProfileOwnerOrRole,
+} = require("../middleware/profileAccess.middleware");
 
 const router = express.Router();
 
@@ -29,6 +35,7 @@ router.delete("/trainers/:id", profileController.removeTrainer);
 router.post(
   "/certifications",
   validateRequest(["trainer_id", "title"]),
+  authorizeSelfOrRole(["admin"], ["body.trainer_id"]),
   profileController.createCertificationEntry,
 );
 router.get(
@@ -36,7 +43,15 @@ router.get(
   profileController.listCertifications,
 );
 router.get("/certifications/:id", profileController.getCertification);
-router.put("/certifications/:id", profileController.updateCertificationEntry);
-router.delete("/certifications/:id", profileController.removeCertification);
+router.put(
+  "/certifications/:id",
+  authorizeSelfOrRole(["admin"], ["body.trainer_id"]),
+  profileController.updateCertificationEntry,
+);
+router.delete(
+  "/certifications/:id",
+  authorizeSelfOrRole(["admin"], ["body.trainer_id"]),
+  profileController.removeCertification,
+);
 
 module.exports = router;
