@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gym-profile-service
+  namespace: gym-dev
   labels:
     app: gym-profile-service
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: gym-profile-service
@@ -19,31 +20,51 @@ spec:
           image: busybox:1.35.0
           imagePullPolicy: IfNotPresent
           command:
-            [
-              "sh",
-              "-c",
-              "until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;",
-            ]
+            - sh
+            - -c
+            - until nc -z profile-postgres 5432; do echo "waiting for profile-postgres"; sleep 2; done;
+        - name: wait-for-kafka
+          image: busybox:1.35.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - until nc -z kafka-service 9092; do echo "waiting for kafka"; sleep 2; done;
       containers:
         - name: app
-          # Replace with your built image (push to registry in your CD pipeline)
-          image: your-registry/gym-profile-service:latest
-          imagePullPolicy: IfNotPresent
+          image: <account-id>.dkr.ecr.<region>.amazonaws.com/gym-profile-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 4002
               name: http
           env:
-            # The CD pipeline should create a secret called `postgres-secret` with a
-            # key `DATABASE_URL` containing the full connection string, e.g.
-            # postgresql://user:password@postgres:5432/dbname
+            - name: PORT
+              value: "4002"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: DATABASE_URL
-            # Optional: PGSSLMODE if you require SSL
             - name: PGSSLMODE
               value: "disable"
-
-# The app pods will resolve DNS name `postgres` in the same namespace and
-# connect using the `DATABASE_URL` secret value provided by your CD pipeline.
+            - name: KAFKA_BROKERS
+              value: "kafka-service:9092"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4002
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

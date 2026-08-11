@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: profile-postgres
+  namespace: gym-dev
   labels:
     app: postgres
 spec:
+  type: ClusterIP
   ports:
     - port: 5432
       targetPort: 5432
@@ -12,5 +14,3 @@ spec:
       name: postgres
   selector:
     app: postgres
-  # For a single-primary DB this ClusterIP service provides a stable DNS name
-  # that your app can use: `postgres` (within same namespace) -> `postgres.<ns>.svc.cluster.local`
