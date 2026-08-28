@@ -1,7 +1,7 @@
+const bcrypt = require("bcrypt");
 const {
   createCustomerProfile,
   getCustomerById,
-  getCustomerByUserId,
   updateCustomer,
   deleteCustomer,
   listCustomers,
@@ -10,7 +10,6 @@ const {
 const {
   createTrainerProfile,
   getTrainerById,
-  getTrainerByUserId,
   updateTrainer,
   deleteTrainer,
   listTrainers,
@@ -36,17 +35,6 @@ async function createCustomer(req, res, next) {
 async function getCustomerByIdHandler(req, res, next) {
   try {
     const profile = await getCustomerById(req.params.id);
-    if (!profile)
-      return res.status(404).json({ message: "Customer profile not found" });
-    res.json(profile);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function getCustomerByUserIdHandler(req, res, next) {
-  try {
-    const profile = await getCustomerByUserId(req.params.user_id);
     if (!profile)
       return res.status(404).json({ message: "Customer profile not found" });
     res.json(profile);
@@ -89,13 +77,24 @@ async function listCustomerProfiles(req, res, next) {
 
 async function createTrainer(req, res, next) {
   try {
-    const profile = await createTrainerProfile(req.body);
+    const { password, ...otherData } = req.body;
+    
+    // Hash password before db insertion
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const profile = await createTrainerProfile({
+      ...otherData,
+      password: hashedPassword
+    });
+
+    // Defensively strip password from the response object
+    delete profile.password;
+
     res.status(201).json(profile);
   } catch (error) {
     next(error);
   }
 }
-
 async function getTrainerByIdHandler(req, res, next) {
   try {
     const profile = await getTrainerById(req.params.id);
@@ -107,22 +106,15 @@ async function getTrainerByIdHandler(req, res, next) {
   }
 }
 
-async function getTrainerByUserIdHandler(req, res, next) {
-  try {
-    const profile = await getTrainerByUserId(req.params.user_id);
-    if (!profile)
-      return res.status(404).json({ message: "Trainer profile not found" });
-    res.json(profile);
-  } catch (error) {
-    next(error);
-  }
-}
-
 async function updateTrainerProfile(req, res, next) {
   try {
+
     const profile = await updateTrainer(req.params.id, req.body);
-    if (!profile)
+    
+    if (!profile) {
       return res.status(404).json({ message: "Trainer profile not found" });
+    }
+
     res.json(profile);
   } catch (error) {
     next(error);
@@ -140,10 +132,7 @@ async function removeTrainer(req, res, next) {
 
 async function listTrainerProfiles(req, res, next) {
   try {
-    const profiles = await listTrainers({
-      limit: req.query.limit,
-      offset: req.query.offset,
-    });
+    const profiles = await listTrainers();
     res.json(profiles);
   } catch (error) {
     next(error);
@@ -208,13 +197,11 @@ async function removeCertification(req, res, next) {
 module.exports = {
   createCustomer,
   getCustomerByIdHandler,
-  getCustomerByUserIdHandler,
   updateCustomerProfile,
   removeCustomer,
   listCustomerProfiles,
   createTrainer,
   getTrainerByIdHandler,
-  getTrainerByUserIdHandler,
   updateTrainerProfile,
   removeTrainer,
   listTrainerProfiles,
